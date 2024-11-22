@@ -20,6 +20,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.2",
     "nodemon": "^3.1.7",
-    "razorpay": "^2.9.5"
+    "password-validator": "^5.3.0",
+    "razorpay": "^2.9.5",
+    "validator": "^13.12.0"
   }
 }
