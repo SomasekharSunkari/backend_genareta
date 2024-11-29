@@ -3,19 +3,17 @@ import FormData from "form-data";
 import axios from "axios"
 export const imageGenarator = async (req, res) => {
     try {
-        const { userId, prompt } = req.body; sss
+        const { userId, prompt } = req.body;
         const user = await UserModel.findById(userId)
         if (!user || !prompt) {
             return res.json({ success: false, message: "Missing Details !" });
-
         }
-
         if (user.creditBalance == 0 || user.creditBalance < 0) {
             return res.json({ success: false, message: "No Credit Balance !", creditBalance: user.creditBalance })
         }
         const formdata = new FormData();
         formdata.append("prompt", prompt);
-        const { data } = axios.post("https://clipdrop-api.co/text-to-image/v1", formdata, {
+        const { data } = await axios.post("https://clipdrop-api.co/text-to-image/v1", formdata, {
             headers: {
                 'x-api-key': process.env.CLIP_BOARD_API
             },
