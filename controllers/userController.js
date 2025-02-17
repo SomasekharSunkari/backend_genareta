@@ -8,7 +8,7 @@ import transaction from "../models/transactionSchema.js";
 const passwordSchema = new PasswordValidator();
 passwordSchema
     .is().min(8)                                    // Minimum length 8
-    .is().max(100)                                  // Maximum length 100
+    .is().max(15)                                  // Maximum length 100
     .has().uppercase()                              // Must have uppercase letters
     .has().lowercase()                              // Must have lowercase letters
     .has().digits(2)                                // Must have at least 2 digits
@@ -32,18 +32,17 @@ const registerUser = async (req, res) => {
         }
         const newUser = new UserModel(userData)
         const user = await newUser.save()
-        console.log("I am in sugn j")
         const token = jwt.sign({ id: user._id }, process.env.JWT_TOKEN)
         res.json({ success: true, token, user: user.name });
     }
     catch (err) {
         console.log(err)
-        res.json({ success: false, message: err.message })
+        res.json({ success: false, message: "User Already Exists" })
     }
 }
 const LoginUser = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { email, password } = req.body;
 
         if (!email || !password) return res.json({ success: false, message: "Missing Details!" });
         const user = await UserModel.findOne({ email });
@@ -53,15 +52,15 @@ const LoginUser = async (req, res) => {
         const isPassMatch = await bcrypt.compare(password, user.password)
         if (isPassMatch) {
             const token = jwt.sign({ id: user._id }, process.env.JWT_TOKEN)
-            res.json({ success: true, token, user: user.name })
+            return res.json({ success: true, token, user: user.name })
         }
         else {
-            res.json({ success: false, message: "Invalid Credentials !" })
+            return res.json({ success: false, message: "Invalid Credentials !" })
         }
     }
     catch (err) {
         console.log(err.message);
-        res.send({ success: false, err: err.message })
+        return res.send({ success: false, err: err.message })
 
     }
 }
@@ -69,13 +68,13 @@ const userCreditBalance = async (req, res) => {
     try {
         const { userId } = req.body;
         const user = await UserModel.findById(userId)
-        res.json({ success: true, credits: user.creditBalance, user: user.name })
+        return res.json({ success: true, credits: user.creditBalance, user: user.name })
 
     }
     catch (err) {
 
         console.log(err.message);
-        res.json({ success: false, message: err.message })
+        return res.json({ success: false, message: err.message })
     }
 }
 const razorpayInstance = new razorpay({

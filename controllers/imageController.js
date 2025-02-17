@@ -1,6 +1,7 @@
 import UserModel from "../models/userSchema.js";
 import FormData from "form-data";
 import axios from "axios"
+import Image from "../models/Images.js";
 export const imageGenarator = async (req, res) => {
     try {
         const { userId, prompt } = req.body;
@@ -22,6 +23,12 @@ export const imageGenarator = async (req, res) => {
         const base64Image = Buffer.from(data, 'binary').toString('base64');
         const resultImage = `data:image/png;base64,${base64Image}`
 
+        const newImage = new Image({
+            user: userId,
+            uri: resultImage
+        });
+
+        await newImage.save();
         await UserModel.findByIdAndUpdate(user._id, { creditBalance: user.creditBalance - 1 })
         return res.json({ success: true, message: "Image Generated", creditBalance: user.creditBalance - 1, resultImage })
     }
@@ -31,3 +38,19 @@ export const imageGenarator = async (req, res) => {
 
     }
 }
+export const getUserImages = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const images = await Image.find({ user: userId }).sort({ createdAt: -1 }).select("uri -_id");
+
+        if (!images.length) {
+            return res.json({ success: false, message: "No images found!" });
+        }
+
+        res.json({ success: true, images });
+
+    } catch (err) {
+        console.log(err);
+        res.json({ success: false, message: err.message });
+    }
+};

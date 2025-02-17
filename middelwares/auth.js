@@ -12,7 +12,6 @@ const authCheck = async (req, res, next) => {
         }
         else {
             return res.json({ success: false, message: "Not Authorized ! Login again to Continue !" })
-
         }
         next();
     }
